@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<InputData>
+  <Grid>
+	<GridX>1000</GridX>
+	<GridY>1000</GridY>
+  </Grid>
+  <ObjectList>
+    <Sun>
+     <Type>1</Type>
+  	 <CoordinateX>0</CoordinateX>
+	 <CoordinateY>0</CoordinateY>
+     <Radius>696000000</Radius>
+     <Weight>1.9891*10**30</Weight>
+     <SpeedX>0</SpeedX>
+	 <SpeedY>0</SpeedY>
+     <Colour>yellow</Colour>
+    </Sun>
+    <Earth>
+     <Type>2</Type>
+  	 <CoordinateX>-149.6*10**9</CoordinateX>
+	 <CoordinateY>0</CoordinateY>
+     <Radius>6371000</Radius>
+     <Weight>5.9722*10**24</Weight>
+     <SpeedX>0</SpeedX>
+	 <SpeedY>29782.77</SpeedY>
+     <Colour>yellow</Colour>
+    </Earth>
+    <Asteroid>
+     <Type>3</Type>
+  	 <CoordinateX>-149.6*10**9+123104000</CoordinateX>
+	 <CoordinateY>149.6*10**9+1231040000</CoordinateY>
+     <Radius>463500</Radius>
+     <Weight>9.393*10**20</Weight>
+     <SpeedX>3000</SpeedX>
+	 <SpeedY>29782.77</SpeedY>
+     <Colour>yellow</Colour>
+    </Asteroid>
+  </ObjectList>
+</InputData>
+
