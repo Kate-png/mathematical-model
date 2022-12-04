@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<InputData>
+  <ObjectList>
+    <Object id="1">
+     <Type>1</Type>
+     <CoordinateX>0</CoordinateX>
+     <CoordinateY>0</CoordinateY>
+     <Radius>696000000</Radius>
+     <Weight>1.9891*10**30</Weight>
+     <SpeedX>0</SpeedX>
+     <SpeedY>0</SpeedY>
+     <Colour>yellow</Colour>
+     <Name>Sun</Name>
+    </Object>
+    <Object id="2">
+     <Type>2</Type>
+     <CoordinateX>-149.6*10**9</CoordinateX>
+     <CoordinateY>1</CoordinateY>
+     <Radius>6371000</Radius>
+     <Weight>5.9722*10**24</Weight>
+     <SpeedX>0</SpeedX>
+     <SpeedY>29782.77</SpeedY>
+     <Colour>blue</Colour>
+     <Name>Earth</Name>
+    </Object>
+    <Object id="3">
+     <Type>3</Type>
+     <CoordinateX>-149.6*10**9+123104000</CoordinateX>
+     <CoordinateY>149.6*10**9+1231040000</CoordinateY>
+     <Radius>463500</Radius>
+     <Weight>9.393*10**20</Weight>
+     <SpeedX>3000</SpeedX>
+     <SpeedY>29782.77</SpeedY>
+     <Colour>red</Colour>
+     <Name>Asteroid</Name>
+    </Object>
+    <Object id="4">
+     <Type>2</Type>
+     <CoordinateX>-149.6*10**9+363104000</CoordinateX>
+     <CoordinateY>0</CoordinateY>
+     <Radius>1737100</Radius>
+     <Weight>7.35*10**22</Weight>
+     <SpeedX>0</SpeedX>
+     <SpeedY>29782.77+1080</SpeedY>
+     <Colour>grey</Colour>
+     <Name>Moon</Name>
+    </Object>
+    <Object id="5">
+     <Type>2</Type>
+     <CoordinateX>69.6*10**9</CoordinateX>
+     <CoordinateY>30*10**9</CoordinateY>
+     <Radius>6_371_000</Radius>
+     <Weight>5.9722*10**24</Weight>
+     <SpeedX>0</SpeedX>
+     <SpeedY>27782.77</SpeedY>
+     <Colour>brown</Colour>
+     <Name>Planet</Name>
+    </Object>
+    <Object id="6">
+     <Type>2</Type>
+     <CoordinateX>-778_570_000_000</CoordinateX>
+     <CoordinateY>0</CoordinateY>
+     <Radius>71492000</Radius>
+     <Weight>1.8986*10**27</Weight>
+     <SpeedX>0</SpeedX>
+     <SpeedY>13070</SpeedY>
+     <Colour>orange</Colour>
+     <Name>Jupiter</Name>
+    </Object>
+  </ObjectList>
+</InputData>
