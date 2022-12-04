@@ -13,9 +13,9 @@ k = 1_000_000 #метров в пикселе на момент инициализации, масштаб
 w_x = -600_000_000 #координаты угла окна 
 w_y = -400_000_000 #на общей карте
 atm = 0  #включение и выключение атмосферы
-wind = 0 #давление солнечного света
-I=83500 #интенстивность излучления звезды
+wind = 0 #включение и выключение давления солнечного света
 entry=0 #запись в файл
+
 
 
 vrem_k = 1 # коэффициент ускорения времени на начало, 1 - реальное время, 
@@ -48,6 +48,8 @@ class Objects(): #спрайт всех объектов
 
         self.s_x = 0 #смещение центра масс по х для планет
         self.s_y = 0 #смещение центра масс по y для планет
+        self.I = 0 #интенстивность излучления звезды
+        self.po = 1*10**(-13) #средняя плотность атмосферы
 
     def update(self): #расчет характеристик тел в каждый момент времени
         self.a[0] = ((self.f[0]/self.m)*(vrem_k**2)/FPS**2) #расчет ускорения по 2 закону Ньютона a=F/m
@@ -56,7 +58,7 @@ class Objects(): #спрайт всех объектов
         self.speed[0] +=  self.a[0] #расчет скорости
         self.speed[1] +=  self.a[1] 
 
-        while (self.speed[0]>120000*(vrem_k/FPS) or self.speed[1]>120000*(vrem_k/FPS) or self.speed[0]<-120000*(vrem_k/FPS) or self.speed[1]<-120000*(vrem_k/FPS)):
+        while (self.speed[0]>500_000*(vrem_k/FPS) or self.speed[1]>500_000*(vrem_k/FPS) or self.speed[0]<-500_000*(vrem_k/FPS) or self.speed[1]<-500_000*(vrem_k/FPS)):
             self.speed[0]/=2;
             self.speed[1]/=2;#принудительное ограничение скорости
 
@@ -106,7 +108,7 @@ class Objects(): #спрайт всех объектов
                            ((self.real_x - w_x)/k, #вычисление координат места на карте для рисования
                             (self.real_y - w_y)/k),
                            (self.real_r+12000_000)/k,
-                           2
+                           1
                            ) #отрисовка контура атмосферы
 
         if wind==1 and self.types==1:
@@ -133,21 +135,28 @@ objects = []   #Объектов на карте
 
 
 
-
-tree = ET.parse("data.xml")
+#считывание с файла
+tree = ET.parse("data2.xml")
 Ob=tree.findall('ObjectList/Object')
 #Считывание с xml-файла данных с автоматическим вычислением и преобразованием в нужный тип данных
 for i in range(len(Ob)):
-    p = Objects(int(Ob[i].find('Type').text),
-                float(ne.evaluate(Ob[i].find('CoordinateX').text)),
-                float(ne.evaluate(Ob[i].find('CoordinateY').text)),
-                float(ne.evaluate(Ob[i].find('Radius').text)),
-                float(ne.evaluate(Ob[i].find('Weight').text)),
-                Ob[i].find('Colour').text)
+    p = Objects(int(Ob[i].find('Type').text),#считываем тип объекта
+                float(ne.evaluate(Ob[i].find('CoordinateX').text)), #координата центра по х
+                float(ne.evaluate(Ob[i].find('CoordinateY').text)), #координата центра по y
+                float(ne.evaluate(Ob[i].find('Radius').text)), #радиус объекта
+                float(ne.evaluate(Ob[i].find('Weight').text)), #вес
+                Ob[i].find('Colour').text) #цвет
     objects.append(p)
-    objects[i].speed[0]+=float(ne.evaluate(Ob[i].find('SpeedX').text))*(vrem_k/FPS)
-    objects[i].speed[1]+= float(ne.evaluate(Ob[i].find('SpeedY').text))*(vrem_k/FPS)
-    objects[i].name = Ob[i].find('Name').text;
+    objects[i].speed[0]+=float(ne.evaluate(Ob[i].find('SpeedX').text))*(vrem_k/FPS) #скорость по х
+    objects[i].speed[1]+= float(ne.evaluate(Ob[i].find('SpeedY').text))*(vrem_k/FPS) #скорость по y
+    objects[i].name = Ob[i].find('Name').text; #имя объекта
+    try:
+        objects[i].I = float(ne.evaluate(Ob[i].find('Intensity').text)) #интенсивность излучения
+    except BaseException: objects[i].I=0 #если объекты не соответствующего типа, то эти данные не используются
+    try:
+        objects[i].po = float(ne.evaluate(Ob[i].find('Density').text)) #средняя плотность атмосферы
+    except BaseException: objects[i].po=0 #если объекты не соответствующего типа, то эти данные не используются
+
 
 
 
@@ -290,10 +299,11 @@ while running:
             if event.button == 2:
 
                 #добавление рандомной планеты
-                q=Objects(2,jump_x,jump_y,rn.uniform(100000, 5000000),rn.uniform(1, 5)*10**rn.randint(25, 30),'purple')
+                q=Objects(2,jump_x,jump_y,rn.uniform(100000, 5000000),rn.uniform(1, 5)*10**rn.randint(26, 27),
+                          rn.choice(['purple','red','yellow','green','blue']))
                 objects.append(q)
-                q.speed[0] = rn.uniform(-100000000, 100000000)
-                q.speed[1] = rn.uniform(-100000000, 100000000)
+                q.speed[0] = rn.uniform(-120000, 120000)*(vrem_k/FPS)
+                q.speed[1] = rn.uniform(-120000, 120000)*(vrem_k/FPS)
                 q.name = 'Planet'+str(rn.randint(10, 1000))
                 
             if event.button == 5:  #увеличение масштаба (отдаление)
@@ -324,20 +334,82 @@ while running:
             d = (dx**2+dy**2)**0.5 #действительное расстояние
             ff = G*objects[i].m*objects[j].m/d**2 #закон всемирного тяготения
             
-            if wind==1 and objects[i].types==1:
-                fw = I/299_792_458*(1-0.1+0.9)*2*3.141592*objects[j].real_r #расчет силы давления света, действующего на объект
+
+            #расчет давления света (солнечного ветра)
+            if wind==1 and objects[j].types==1:
+                fw = objects[j].I/299_792_458*(1-0.1+0.9)*2*3.141592*objects[i].real_r #расчет силы давления света, действующего на объект
+                if objects[i].types!=1:
+                    objects[i].f[0] -= dx*fw/d #коррекция сил на силу давления света
+                    objects[i].f[1] -= dy*fw/d
+
+            if wind==1 and objects[i].types==1:#дубликат с инверсными индексами, нужен для учета порядка взятия объектов
+                fw = objects[i].I/299_792_458*(1-0.1+0.9)*2*3.141592*objects[j].real_r #расчет силы давления света, действующего на объект
                 if objects[j].types!=1:
-                    objects[j].f[0] += dx*fw/d #коррекция сил
+                    objects[j].f[0] += dx*fw/d #коррекция сил на силу давления света
                     objects[j].f[1] += dy*fw/d
-            
 
 
-            objects[i].f[0] += dx*ff/d #проекция силы на х для первого объекта
+
+
+                       #расчет сил лобового сопротивления атмосферы
+            if atm == 1 and objects[i].real_r+12000_000 > d - objects[j].real_r and objects[i].types ==2:
+                fs_x = 2/2*objects[i].po*objects[j].speed[0]**2*(3.1415926*objects[j].real_r**2) #вычисление лобового сопротивления по координатам
+                fs_y = 2/2*objects[i].po*objects[j].speed[1]**2*(3.1415926*objects[j].real_r**2)
+
+                if objects[j].speed[0]>0: 
+                    if  objects[j].speed[0]-fs_x/objects[j].m > 0: objects[j].f[0]-=fs_x  #направляем силу сопротивления противоположно скорости по х
+                    else: objects[j].speed[0]=0 #если сопротивление превысило скорость
+                else: 
+                    if objects[j].speed[0]+fs_x/objects[j].m<0: objects[j].f[0]+=fs_x  #направляем силу сопротивления противоположно скорости по х
+                    else: objects[j].speed[0]=0 #если сопротивление превысило скорость
+
+                if objects[j].speed[1]>0: 
+                    if  objects[j].speed[1]-fs_y/objects[j].m > 0: objects[j].f[1]-=fs_y
+                    else: objects[j].speed[1]=0 #если сопротивление превысило скорость
+                else: 
+                    if objects[j].speed[1]+fs_y/objects[j].m<0: objects[j].f[1]+=fs_y #направляем силу сопротивления противоположно скорости по y
+                    else: objects[j].speed[1]=0
+
+
+            if atm == 1 and objects[j].real_r+12000_000 > d - objects[i].real_r and objects[j].types ==2: #дубликат с инверсными индексами
+                fs_x = 2/2*objects[j].po*objects[i].speed[0]**2*(3.1415926*objects[i].real_r**2) #вычисление лобового сопротивления по координатам
+                fs_y = 2/2*objects[j].po*objects[i].speed[1]**2*(3.1415926*objects[i].real_r**2)
+
+                if objects[i].speed[0]>0: 
+                    if  objects[i].speed[0]-fs_x/objects[i].m > 0: objects[i].f[0]-=fs_x  #направляем силу сопротивления противоположно скорости по х
+                    else: objects[i].speed[0]=0 #если сопротивление превысило скорость
+                else: 
+                    if objects[i].speed[0]+fs_x/objects[i].m<0: objects[i].f[0]+=fs_x  #направляем силу сопротивления противоположно скорости по х
+                    else: objects[i].speed[0]=0 #если сопротивление превысило скорость
+
+                if objects[i].speed[1]>0: 
+                    if  objects[i].speed[1]-fs_y/objects[i].m > 0: objects[i].f[1]-=fs_y
+                    else: objects[i].speed[1]=0 #если сопротивление превысило скорость
+                else: 
+                    if objects[i].speed[1]+fs_y/objects[i].m<0: objects[i].f[1]+=fs_y #направляем силу сопротивления противоположно скорости по y
+                    else: objects[i].speed[1]=0
+
+
+
+
+
+
+
+
+
+
+            objects[i].f[0] += dx*ff/d #проекция силы гравитации на х для первого объекта
             objects[i].f[1] += dy*ff/d #проекция силы на y для первого объекта
 
 
             objects[j].f[0] -= dx*ff/d #проекция силы на х для второго объекта
             objects[j].f[1] -= dy*ff/d #проекция силы на y для второго объекта
+
+
+
+ 
+
+
 
             if objects[i].real_r > d - objects[j].real_r: #проверка, не столкнулись ли объекты
                 collisions.append((i,j))
